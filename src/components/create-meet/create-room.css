@@ -1,0 +1,68 @@
+.create-room{
+    padding: 2rem;
+    background-color: #f9f9f9;
+    width: 25rem;
+    min-height:100vh;
+    padding-top:7rem;
+    width:25rem;
+}
+.create-room h2{
+    color: #1B56FD;
+    font-size: 1.8rem;
+    text-align: center;
+    font-weight:800;
+}
+.form{
+    padding:2rem 0rem;
+    display:flex;
+    flex-direction: column;
+    gap:1.2rem;
+}
+.form input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    /* width: 303px; */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  input:focus {
+     border: 2px solid  #1B56FD; 
+     outline: none; 
+  }
+  .form .invite{
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-right: 1rem;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor:pointer
+  }
+  .form .invite:hover{
+    background-color: #E9DFC3;
+    border: 1px solid #E9DFC3;
+  }
+  .form .create {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #118B50;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #118B50;
+    color: white;
+  }
+  .form .create:hover {
+    background-color: #01773e;
+  }
+  .gmail-invite-modal{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  }

@@ -1,0 +1,145 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { socket } from '../sidebar/sidebar'
+import { useParams } from 'react-router-dom';
+
+const VideoRoom = ({roomID}) => {
+  const [peers, setPeers] = useState({});
+  const [streams, setStreams] = useState({});
+  const [localStream, setLocalStream] = useState(null);
+  const [micEnabled, setMicEnabled] = useState(true);
+  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const peersRef = useRef({});
+
+  // const { roomID } = useParams();
+
+  useEffect(() => {
+    const initMedia = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setLocalStream(stream);
+      socket.emit('join-room', roomID);
+    };
+
+    initMedia();
+
+    socket.on('user-joined', async ({ userId }) => {
+      const peer = createPeer(userId, socket.id, localStream);
+      peersRef.current[userId] = peer;
+    });
+
+    socket.on('receive-call', async ({ signal, from }) => {
+      const peer = addPeer(signal, from, localStream);
+      peersRef.current[from] = peer;
+    });
+
+    socket.on('signal', ({ from, signal }) => {
+      const peer = peersRef.current[from];
+      if (peer) {
+        peer.signal(signal);
+      }
+    });
+
+    return () => {
+      Object.values(peersRef.current).forEach(peer => peer.destroy());
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [roomID]);
+
+  const createPeer = (userToSignal, callerID, stream) => {
+    const Peer = require('simple-peer');
+    const peer = new Peer({ initiator: true, trickle: false, stream });
+
+    peer.on('signal', signal => {
+      socket.emit('send-signal', { userToSignal, callerID, signal });
+    });
+
+    peer.on('stream', stream => {
+      setStreams(prev => ({ ...prev, [userToSignal]: stream }));
+    });
+
+    return peer;
+  };
+
+  const addPeer = (incomingSignal, callerID, stream) => {
+    const Peer = require('simple-peer');
+    const peer = new Peer({ initiator: false, trickle: false, stream });
+
+    peer.on('signal', signal => {
+      socket.emit('return-signal', { signal, to: callerID });
+    });
+
+    peer.on('stream', stream => {
+      setStreams(prev => ({ ...prev, [callerID]: stream }));
+    });
+
+    peer.signal(incomingSignal);
+
+    return peer;
+  };
+
+  const toggleMic = () => {
+    if (!localStream) return;
+    const micTrack = localStream.getAudioTracks()[0];
+    micTrack.enabled = !micTrack.enabled;
+    setMicEnabled(micTrack.enabled);
+  };
+
+  const toggleCamera = () => {
+    if (!localStream) return;
+    const videoTrack = localStream.getVideoTracks()[0];
+    videoTrack.enabled = !videoTrack.enabled;
+    setCameraEnabled(videoTrack.enabled);
+  };
+
+  const startScreenShare = async () => {
+    const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const screenTrack = screenStream.getVideoTracks()[0];
+    Object.values(peersRef.current).forEach(peer => {
+      const sender = peer._pc.getSenders().find(s => s.track.kind === 'video');
+      sender.replaceTrack(screenTrack);
+    });
+
+    screenTrack.onended = () => {
+      const videoTrack = localStream.getVideoTracks()[0];
+      Object.values(peersRef.current).forEach(peer => {
+        const sender = peer._pc.getSenders().find(s => s.track.kind === 'video');
+        sender.replaceTrack(videoTrack);
+      });
+    };
+  };
+
+  return (
+    <div>
+      <h2>Video Room: {roomID}</h2>
+
+      <div className="video-grid">
+        {localStream && (
+          <video
+            ref={video => video && (video.srcObject = localStream)}
+            autoPlay
+            muted
+            className="video-tile"
+          />
+        )}
+
+        {Object.entries(streams).map(([peerId, stream]) => (
+          <video
+            key={peerId}
+            ref={video => video && (video.srcObject = stream)}
+            autoPlay
+            className="video-tile"
+          />
+        ))}
+      </div>
+
+      <div className="controls">
+        <button onClick={toggleMic}>{micEnabled ? 'Mute Mic' : 'Unmute Mic'}</button>
+        <button onClick={toggleCamera}>{cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}</button>
+        <button onClick={startScreenShare}>Share Screen</button>
+      </div>
+    </div>
+  );
+};
+
+export default VideoRoom;

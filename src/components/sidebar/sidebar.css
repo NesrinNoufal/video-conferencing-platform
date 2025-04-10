@@ -1,0 +1,72 @@
+.sidebar {
+    font-family: sans-serif;
+    padding: 2rem !important;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    display: flex;
+    width: 25rem;
+    flex-direction: column;
+  }
+  .sidebar-left {
+    font-family: sans-serif;
+    padding: 2rem !important;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    display: flex;
+    width: 25rem;
+    flex-direction: column;
+  }
+  .join-container{
+    color: #1B56FD;
+    font-size: 1.5rem;
+    text-align: center;
+    padding-top: 5rem;
+    width:21rem;
+  }
+ .join-a-meet{
+    padding-top: 2rem;
+    display: flex;
+    justify-content:space-between;
+  }
+  .join-a-meet input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    /* margin-right: 1rem; */
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  input:focus {
+     border: 2px solid  #1B56FD; 
+     outline: none; 
+  }
+  .join-container button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #118B50;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #118B50;
+    color: white;
+  }
+  .join-container button:hover {
+    background-color: #01773e;
+  }
+  .create-meet {
+    margin-top: 2rem;
+    text-align: center;
+  }
+  .create-meet a {
+    font-size: 1rem;
+    color:  #118B50;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .create-meet p:hover {
+    text-decoration: underline;
+  }
+  .sidebar-right {
+    display: flex;
+    flex:1;
+  }
