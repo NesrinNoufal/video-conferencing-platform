@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { socket } from '../sidebar/sidebar'
 import { useParams } from 'react-router-dom';
+import "./meet-room.css"
 
-const VideoRoom = ({roomID}) => {
+
+const VideoRoom = ({roomID,isJoined}) => {
   const [peers, setPeers] = useState({});
   const [streams, setStreams] = useState({});
-  const [localStream, setLocalStream] = useState(null);
+  const [localStream, setLocalStream] = useState(false);
   const [micEnabled, setMicEnabled] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(true);
   const peersRef = useRef({});
-
-  // const { roomID } = useParams();
 
   useEffect(() => {
     const initMedia = async () => {
@@ -19,7 +19,7 @@ const VideoRoom = ({roomID}) => {
       socket.emit('join-room', roomID);
     };
 
-    initMedia();
+     initMedia();
 
     socket.on('user-joined', async ({ userId }) => {
       const peer = createPeer(userId, socket.id, localStream);
@@ -108,11 +108,15 @@ const VideoRoom = ({roomID}) => {
       });
     };
   };
-
+  useEffect(()=>{
+    console.log("roomID",roomID)
+    console.log("isJoined",isJoined);
+  },[roomID,isJoined]);
   return (
-    <div>
-      <h2>Video Room: {roomID}</h2>
 
+    <div className='meet-room'>
+    {isJoined ? (
+      <div className='meet-screen'>
       <div className="video-grid">
         {localStream && (
           <video
@@ -132,12 +136,16 @@ const VideoRoom = ({roomID}) => {
           />
         ))}
       </div>
-
       <div className="controls">
         <button onClick={toggleMic}>{micEnabled ? 'Mute Mic' : 'Unmute Mic'}</button>
         <button onClick={toggleCamera}>{cameraEnabled ? 'Turn Off Camera' : 'Turn On Camera'}</button>
         <button onClick={startScreenShare}>Share Screen</button>
       </div>
+      </div>
+    ) : 
+    <div className='no-meet'>
+    </div>
+}
     </div>
   );
 };

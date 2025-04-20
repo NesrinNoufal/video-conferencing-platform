@@ -6,6 +6,12 @@
     padding-top:7rem;
     width:25rem;
 }
+img{
+  width:20px;
+  height:20px;
+  position:absolute; 
+  top:2rem;
+}
 .create-room h2{
     color: #1B56FD;
     font-size: 1.8rem;

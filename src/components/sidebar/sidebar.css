@@ -1,15 +1,5 @@
 .sidebar {
     font-family: sans-serif;
-    padding: 2rem !important;
-    background-color: #f9f9f9;
-    min-height: 100vh;
-    display: flex;
-    width: 25rem;
-    flex-direction: column;
-  }
-  .sidebar-left {
-    font-family: sans-serif;
-    padding: 2rem !important;
     background-color: #f9f9f9;
     min-height: 100vh;
     display: flex;
@@ -17,11 +7,12 @@
     flex-direction: column;
   }
   .join-container{
+    padding: 2rem ;
     color: #1B56FD;
-    font-size: 1.5rem;
     text-align: center;
-    padding-top: 5rem;
-    width:21rem;
+    padding-top: 7rem; 
+    width:100%;
+    min-height: 100vh;
   }
  .join-a-meet{
     padding-top: 2rem;
@@ -31,7 +22,6 @@
   .join-a-meet input {
     padding: 0.5rem;
     font-size: 1rem;
-    /* margin-right: 1rem; */
     width: 250px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -65,8 +55,4 @@
   }
   .create-meet p:hover {
     text-decoration: underline;
-  }
-  .sidebar-right {
-    display: flex;
-    flex:1;
   }

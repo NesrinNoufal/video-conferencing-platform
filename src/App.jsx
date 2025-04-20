@@ -1,9 +1,6 @@
 import "./App.css"
-import Sidebar from "./components/sidebar/sidebar";
-// import MeetRoom from "./components/meet-room/meet-room";
 import { Routes, Route } from "react-router-dom";
-import CreateRoom from "./components/create-meet/create-room";
-import VideoRoom from "./components/meet-room/meet-room";
+import Home from "./components/home/home";
 
 
 const App = () => {
@@ -11,9 +8,8 @@ const App = () => {
   return (
     <div className="app">
            <Routes>
-        <Route path="/" element={<Sidebar />} />
-        <Route path="/create-meet" element={<CreateRoom />} />
-        <Route path="/video-room/:roomID" element={<VideoRoom />} />
+        <Route path="/" element={<Home/>} />
+        <Route path="/meet-room/:roomID" element={<Home />} />
       </Routes>
     </div>
   );
