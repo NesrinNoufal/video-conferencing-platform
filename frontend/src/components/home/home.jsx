@@ -1,6 +1,5 @@
 import React from 'react'
 import { useState } from 'react'
-import { socket } from '../sidebar/sidebar'
 import Sidebar from '../sidebar/sidebar'
 import VideoRoom from '../meet-room/meet-room';
 import "../home/home.css"
@@ -25,7 +24,6 @@ const Home = () => {
         />
         <VideoRoom 
         roomID={roomID} 
-        isJoined={isJoined}
         />
     </div>
   )

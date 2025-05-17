@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { socket } from "../sidebar/sidebar";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState,useContext } from "react";
 import "./meet-room.css";
+import { SocketContext } from '../../context'
 
 const VideoRoom = ({ roomID, isJoined }) => {
   const [micEnabled, setMicEnabled] = useState(true);
@@ -45,14 +44,13 @@ const VideoRoom = ({ roomID, isJoined }) => {
       });
     };
   };
-  useEffect(() => {
-    console.log("roomID", roomID);
-    console.log("isJoined", isJoined);
-  }, [roomID, isJoined]);
+  // useEffect(() => {
+  //   console.log("roomID", roomID);
+  //   console.log("isJoined", isJoined);
+  // }, [roomID, isJoined]);
 
   return (
     <div className="meet-room">
-      {isJoined ? (
         <div className="meet-screen">
           <div className="video-grid">
             <div className="video-grid">
@@ -60,9 +58,7 @@ const VideoRoom = ({ roomID, isJoined }) => {
               {stream && (
                 <video
                   key="local"
-                  ref={(video) => {
-                    if (video) video.srcObject = localStream;
-                  }}
+                  ref={myVideo}
                   autoPlay
                   playsInline
                   muted
@@ -70,18 +66,18 @@ const VideoRoom = ({ roomID, isJoined }) => {
                 />
               )}
 
-              {/* Remote peers */}
-              {Object.entries(streams).map(([peerId, stream]) => (
+                    {/* if callAccepted and call did not end then User's video */}
+             {callAccepted && !callEnded && (
+
+              // {Object.entries(streams).map(([peerId, stream]) => (
                 <video
                   key={peerId}
-                  ref={(video) => {
-                    if (video) video.srcObject = stream;
-                  }}
+                  ref={userVideo}
                   autoPlay
                   playsInline
                   className="video-tile"
                 />
-              ))}
+              )}
             </div>
           </div>
           <div className="controls">
@@ -94,9 +90,6 @@ const VideoRoom = ({ roomID, isJoined }) => {
             <button onClick={startScreenShare}>Share Screen</button>
           </div>
         </div>
-      ) : (
-        <div className="no-meet"></div>
-      )}
     </div>
   );
 };

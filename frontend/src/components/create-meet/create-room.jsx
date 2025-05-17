@@ -2,7 +2,6 @@ import React from 'react'
 import {useState,useEffect} from 'react'
 import "./create-room.css"
 import GmailInvite from '../gmail-invite/gmail-invite';
-import { socket } from '../sidebar/sidebar';
 import BackButton from "../../assets/back.png"
 import { useNavigate } from 'react-router-dom';
 

@@ -10,7 +10,7 @@ const server = http.createServer(app);
 // Setup Socket.IO server
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000', // Update as needed
+    origin: 'http://localhost:5173', // Update as needed
     methods: ['GET', 'POST']
   }
 });
@@ -19,45 +19,22 @@ app.use(cors());
 
 const rooms = {}; // Optional: To track room members manually if needed
 
-// Socket.IO Logic
-io.on('connection', (socket) => {
-  console.log(`🔗 New user connected: ${socket.id}`);
+// Socket.io Handlers
+io.on("connection", (socket) => {
+  socket.emit("me", socket.id)
 
-  socket.on('create-room', (roomID) => {
-    socket.join(roomID);
-    console.log(`📌 Room created and joined: ${roomID}`);
-    socket.emit('room-created', roomID);
-  });
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("callEnded")
+  })
 
-  socket.on('join-room', (roomID) => {
-    socket.join(roomID);
-    console.log(`👤 ${socket.id} joined room: ${roomID}`);
+  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
+    io.to(userToCall).emit("callUser", { signal: signalData, from, name })
+  })
 
-    // Get other users in the room (excluding the joining user)
-    const otherUsers = Array.from(io.sockets.adapter.rooms.get(roomID) || [])
-      .filter(id => id !== socket.id);
-
-    // Send existing users to the newly joined user
-    socket.emit('all-users', otherUsers);
-
-    // Notify others that a new user has joined
-    socket.to(roomID).emit('user-joined', socket.id);
-  });
-
-  // Signaling - WebRTC exchange
-  socket.on('signal', ({ target, signal }) => {
-    io.to(target).emit('signal', {
-      sender: socket.id,
-      signal,
-    });
-  });
-
-  // Notify users when someone disconnects
-  socket.on('disconnect', () => {
-    console.log(`❌ User disconnected: ${socket.id}`);
-    io.emit('user-disconnected', socket.id);
-  });
-});
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal)
+  })
+})
 
 const PORT = 5000;
 server.listen(PORT, () => {
