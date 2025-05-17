@@ -6,21 +6,21 @@ import VideoRoom from '../meet-room/meet-room';
 import "../home/home.css"
 
 const Home = () => {
-    const [roomID, setRoomID] = useState("");
-    const [isJoined, setIsJoined] = useState(false);
+     const [roomID, setRoomID] = useState("");
+    // const [isJoined, setIsJoined] = useState(false);
 
 
-    const handleJoinRoom = () => {
-        if (roomID.trim() === '') return;
-        socket.emit("join-room", roomID);
-        setIsJoined(true)
-      };
+    // const handleJoinRoom = () => {
+    //     if (roomID.trim() === '') return;
+    //     socket.emit("join-room", roomID);
+    //     setIsJoined(true)
+    //   };
 
   return (
     <div className='home'>
         <Sidebar 
         roomID={roomID}
-        handleJoinRoom={handleJoinRoom}
+        // handleJoinRoom={handleJoinRoom}
         handleChangeRoomId={(value)=>setRoomID(value)}
         />
         <VideoRoom 

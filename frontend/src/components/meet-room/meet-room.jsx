@@ -4,116 +4,10 @@ import { useParams } from "react-router-dom";
 import "./meet-room.css";
 
 const VideoRoom = ({ roomID, isJoined }) => {
-  const [peers, setPeers] = useState({});
-  const [streams, setStreams] = useState({});
-  const [localStream, setLocalStream] = useState(false);
   const [micEnabled, setMicEnabled] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(true);
-  const peersRef = useRef({});
 
-  useEffect(() => {
-    const initMedia = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      setLocalStream(stream);
-    };
-
-    initMedia();
-  }, []);
-
-  useEffect(() => {
-    if (!localStream) return;
-
-    socket.emit("join-room", roomID);
-
-    socket.on("user-joined", ({ userId }) => {
-      const peer = createPeer(userId, socket.id, localStream);
-      peersRef.current[userId] = peer;
-      setPeers((prev) => ({ ...prev, [userId]: peer }));
-    });
-
-    socket.on("all-users", (users) => {
-      users.forEach((userId) => {
-        const peer = createPeer(userId, socket.id, localStream);
-        peersRef.current[userId] = peer;
-        setPeers((prev) => ({ ...prev, [userId]: peer }));
-      });
-    });
-
-    socket.on("receive-call", async ({ signal, from }) => {
-      const peer = addPeer(signal, from, localStream);
-      peersRef.current[from] = peer;
-    });
-
-    socket.on("signal", ({ from, signal }) => {
-      const peer = peersRef.current[from];
-      if (peer) {
-        peer.signal(signal);
-      }
-    });
-    socket.on("user-disconnected", (userId) => {
-      if (peersRef.current[userId]) {
-        peersRef.current[userId].destroy();
-        delete peersRef.current[userId];
-        setPeers((prev) => {
-          const updated = { ...prev };
-          delete updated[userId];
-          return updated;
-        });
-        setStreams((prev) => {
-          const updated = { ...prev };
-          delete updated[userId];
-          return updated;
-        });
-      }
-    });
-
-    return () => {
-      socket.off("user-joined");
-      socket.off("all-users");
-      socket.off("receive-call");
-      socket.off("signal");
-
-      Object.values(peersRef.current).forEach((peer) => peer.destroy());
-      if (localStream) {
-        localStream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [localStream]);
-
-  const createPeer = (userToSignal, callerID, stream) => {
-    const Peer = require("simple-peer");
-    const peer = new Peer({ initiator: true, trickle: false, stream });
-
-    peer.on("signal", (signal) => {
-      socket.emit("send-signal", { userToSignal, callerID, signal });
-    });
-
-    peer.on("stream", (stream) => {
-      setStreams((prev) => ({ ...prev, [userToSignal]: stream }));
-    });
-
-    return peer;
-  };
-
-  const addPeer = (incomingSignal, callerID, stream) => {
-    const Peer = require("simple-peer");
-    const peer = new Peer({ initiator: false, trickle: false, stream });
-
-    peer.on("signal", (signal) => {
-      socket.emit("return-signal", { signal, to: callerID });
-    });
-
-    peer.on("stream", (stream) => {
-      setStreams((prev) => ({ ...prev, [callerID]: stream }));
-    });
-
-    peer.signal(incomingSignal);
-
-    return peer;
-  };
+  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } = useContext(SocketContext);
 
   const toggleMic = () => {
     if (!localStream) return;
@@ -163,7 +57,7 @@ const VideoRoom = ({ roomID, isJoined }) => {
           <div className="video-grid">
             <div className="video-grid">
               {/* Local video */}
-              {localStream && (
+              {stream && (
                 <video
                   key="local"
                   ref={(video) => {

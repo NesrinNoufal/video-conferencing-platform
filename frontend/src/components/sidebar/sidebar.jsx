@@ -3,10 +3,11 @@ import { io } from 'socket.io-client';
 import './sidebar.css';
 import { Link } from 'react-router-dom';
 import CreateRoom from '../create-meet/create-room';
+import { callUser } from '../../context';
 
 export const socket = io('http://localhost:5000');
 
-const Sidebar = ({roomID, handleJoinRoom,handleChangeRoomId}) => {
+const Sidebar = ({roomID,handleChangeRoomId}) => {
 
     const [view, setView] = useState('join');
 
@@ -29,7 +30,7 @@ const Sidebar = ({roomID, handleJoinRoom,handleChangeRoomId}) => {
             value={roomID}
             onChange={e => handleChangeRoomId(e.target.value)}
           />
-          <button onClick={handleJoinRoom}>Join</button>
+          <button onClick={callUser(roomID)}>Join</button>
           </div>
         <div className="create-meet">
           <p onClick={() => setView('create')}>Create a new meet</p>
