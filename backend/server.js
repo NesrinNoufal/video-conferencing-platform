@@ -3,6 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import connectToDb from './config/db.js';
+import authRoutes from "./routes/authRoutes.js"
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +17,9 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+
+//middleware to parse JSON
+app.use(express.json());
 
 const rooms = {}; // Optional: To track room members manually if needed
 
@@ -35,6 +39,9 @@ io.on("connection", (socket) => {
     io.to(data.to).emit("callAccepted", data.signal)
   })
 })
+
+
+app.use("/auth",authRoutes);
 
 const PORT = 5000;
 server.listen(PORT, () => {
