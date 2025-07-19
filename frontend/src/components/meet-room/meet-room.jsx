@@ -1,12 +1,17 @@
-import React, { useEffect, useState,useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import "./meet-room.css";
-import { SocketContext } from '../../context'
+import { SocketContext } from "../../context";
+import user from "../../assets/profile-user.png";
+import { Link } from "react-router-dom";
+import Profile from "../profile/profile";
 
 const VideoRoom = ({ roomID, isJoined }) => {
   const [micEnabled, setMicEnabled] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [isProfile, setIsProfile] = useState(false);
 
-  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } = useContext(SocketContext);
+  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } =
+    useContext(SocketContext);
 
   const toggleMic = () => {
     if (!localStream) return;
@@ -44,13 +49,26 @@ const VideoRoom = ({ roomID, isJoined }) => {
       });
     };
   };
-  // useEffect(() => {
-  //   console.log("roomID", roomID);
-  //   console.log("isJoined", isJoined);
-  // }, [roomID, isJoined]);
+  useEffect(() => {
+    console.log("roomID", roomID);
+    console.log("isJoined", isJoined);
+  }, [roomID, isJoined]);
 
   return (
     <div className="meet-room">
+      {!roomID ? (
+        <div className="no-meet">
+          <div className="profile">
+            <img
+              src={user}
+              alt="user"
+              onClick={() => {
+                setIsProfile(true);
+              }}
+            />
+          </div>
+        </div>
+      ) : (
         <div className="meet-screen">
           <div className="video-grid">
             <div className="video-grid">
@@ -66,10 +84,9 @@ const VideoRoom = ({ roomID, isJoined }) => {
                 />
               )}
 
-                    {/* if callAccepted and call did not end then User's video */}
-             {callAccepted && !callEnded && (
-
-              // {Object.entries(streams).map(([peerId, stream]) => (
+              {/* if callAccepted and call did not end then User's video */}
+              {callAccepted && !callEnded && (
+                // {Object.entries(streams).map(([peerId, stream]) => (
                 <video
                   key={peerId}
                   ref={userVideo}
@@ -90,6 +107,21 @@ const VideoRoom = ({ roomID, isJoined }) => {
             <button onClick={startScreenShare}>Share Screen</button>
           </div>
         </div>
+      )}
+      {isProfile && (
+        <div className="profile-modal">
+          <div
+            className="profile-modal-overlay"
+            onClick={() => setIsProfile(false)}
+          ></div>
+          <div className="profile-modal-content">
+            <button className="close-btn" onClick={() => setIsProfile(false)}>
+              ✖
+            </button>
+            <Profile />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

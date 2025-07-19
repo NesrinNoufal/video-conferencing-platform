@@ -37,3 +37,55 @@
   background-position: center;
   background-repeat: no-repeat;
   } 
+  .profile img{
+    position:absolute;
+    right:30px;
+    width:30px;
+    height:30px;
+  }
+.profile-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.profile-modal-overlay {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.profile-modal-content {
+  height: 100%;
+  background-color: #fff;
+  padding: 40px 10px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+}
+/* 
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+} */
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
