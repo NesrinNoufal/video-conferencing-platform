@@ -1,10 +1,25 @@
-import mongoose from "mongoose"
+
 import bcrypt from "bcrypt"
+import generateToken from "../utils/generateToken"
+import User from "../db/models/user"
+import redisClient from "../config/redis";
 
 
 export const signup  =  async(req,res) => {
     try{
      const {name,email,password}=req.body;
+
+     const isExistingUser = User.findOne({email:email});
+
+     if(isExistingUser){
+        res.send({status:false,message:"User already exists"});
+     }
+
+     const salt= await bcrypt.genSalt(10);
+     const encryptedPassword=await bcrypt.hash(password,salt);
+
+     const user = {name:name,email:email,password:encryptedPassword};
+     User.create(user);
      
      const response={
         status: true,
@@ -27,7 +42,7 @@ export const login =  async(req,res) => {
     try{
      const {email,password}=req.body;
      
-     const user = await  prisma.user.findUnique({
+     const user = await  User.find({
         where:{
             email:email
         }
@@ -49,20 +64,16 @@ export const login =  async(req,res) => {
         return res.status(420).json(response);
      }
 
-     const accessToken= jwt.sign({id:user.id,role:"admin"},process.env.JWT_SECRET,{expiresIn:'15mnt'})
-     const refreshToken= jwt.sign({id:user.id,role:"admin"},process.env.JWT_SECRET,{expiresIn:'15d'})
+     const token = generateToken(user._id,user.roleId,res);
 
-     res.cookie("authToken",refreshToken,{
-        httpOnly:true,
-        sameSite:"strict",
-        maxAge: 15*24*60*60*1000,
-        secure:true
-     });
+     //cache user data in redis for 1 hr
+
+     await redisClient.setEx(`user:${user._id}`,3600,JSON.stringify(user));
 
      const response={
         status: true,
         message:"Login successfull",
-        token:accessToken
+        token:token
      }
      return res.status(200).json(response);
 
@@ -79,6 +90,19 @@ export const login =  async(req,res) => {
 }
 
 export const logout=async(req,res) => {
-    
+    try{
+       res.clearCookie("token",
+        {
+            httpOnly: true,
+      sameSite: "Strict",
+      secure: process.env.ENVIRONMENT === "PRODUCTION",
+        }
+       );
+
+       return res.status(200).json({status:true,message:"Logged out sucessfully"});
+    }
+    catch(err){
+      return res.status(500).json({status:true,message:"Loggout failed",error:err.message || err});
+    }
 }
 
