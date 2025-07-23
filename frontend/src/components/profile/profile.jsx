@@ -2,8 +2,8 @@ import React from 'react';
 import './profile.css';
 import user from "../../assets/user.png"
 
-const Profile = () => {
- 
+const Profile =React.memo(function Profile ({}) {
+
   const menuItems = ['Account Settings', 'Privacy', 'Notifications', 'Help & Support', 'Logout'];
 
   return (
@@ -21,6 +21,6 @@ const Profile = () => {
         </div>
     </div>
   );
-};
+});
 
 export default Profile;
